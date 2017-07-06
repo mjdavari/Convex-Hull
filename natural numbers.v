@@ -1,8 +1,8 @@
 Inductive N: Set:=
-| javad : N
+| zero : N
 | S: N -> N.
 
-Definition I: N:= S javad.
+Definition I: N:= S zero.
 
 Definition II: N:= S I.
 
@@ -10,7 +10,7 @@ Definition III: N:= S II.
 
 Fixpoint sum (m n :N):=
 match n with
-   | javad => m
+   | zero => m
    | S n'=> S (sum m n')
 end.
 
@@ -20,7 +20,7 @@ simpl.
 trivial.
 Qed.
 
-Lemma unity: forall n:N, sum javad n=n.
+Lemma unity: forall n:N, sum zero n=n.
 Proof.
 induction n.
 -trivial.
@@ -45,6 +45,31 @@ Qed.
 (*Definition product(m n:N) Admitted*)
 
 (*sdggsdfgsfdfg*)
+(* ha ha .. gharar bud ta 5 shanbe zarbo to git bezari.. inam zarb*)
+
+
+Fixpoint mult (m n:N):=
+match n with
+  |zero => zero
+  |S n'=> sum (mult m n') m
+end.
+
+Definition VII: N:= S (S (S III)).
+
+Lemma do_seta_shishta: mult II III=VII.
+Proof. 
+simpl. trivial.
+Qed.
+
+Theorem mozdavaj:forall n, mult n I=n.
+Proof.
+intros.
+simpl.
+apply unity.
+Qed.
+
+(*proof next lemma as exercise*)
+Lemma sherkat: forall l m n:N, mult (mult l m) n=mult l (mult m n).
 
 
 
