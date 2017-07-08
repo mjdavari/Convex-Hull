@@ -14,6 +14,7 @@ match n with
    | S n'=> S (sum m n')
 end.
 
+Notation "a '+' b" := (sum a b)(at level 50, left associativity).
 Lemma ghazie1: sum I II=III.
 Proof.
 simpl.
@@ -48,9 +49,11 @@ match n with
   |S n'=> sum (mult m n') m
 end.
 
-Definition VII: N:= S (S (S III)).
-(*Albatte in nemade 7 ha :D*)
-Lemma do_seta_shishta: mult II III=VII.
+Notation "a '*' b" := (mult a b)(at level 40, left associativity).
+
+Definition VI: N:= S (S (S III)).
+(*Albatte in nemade 7 ha :D--> :)*)
+Lemma do_seta_shishta: mult II III=VI.
 Proof. 
 simpl. trivial.
 Qed.
@@ -73,20 +76,22 @@ Proof.
 intros.
 rewrite komaki2. simpl. trivial.
 Qed.
+
 Lemma Helper2: forall a b c :N, sum (sum a b ) c = sum a (sum b c).
 Proof.
 intros.
 induction a.
--simpl. rewrite unity. rewrite unity. trivial.
--rewrite Helper3. rewrite Helper3. rewrite Helper3. rewrite IHa. trivial.
+- rewrite unity. rewrite unity. trivial.
+-repeat rewrite Helper3; rewrite IHa. trivial.
 Qed.
+
 Lemma Helper1: forall a b:N, mult (S a) b = sum (mult a b) b.
 Proof.
 intros.
 induction b.
 -trivial.
 -simpl. rewrite IHb. rewrite Helper2. 
-rewrite Helper2. rewrite comm with a b. trivial.
+rewrite Helper2. rewrite comm with a b. trivial. (*ino tozih bede*)
 Qed.
 Lemma Jabejaei_Mult: forall a b :N, mult a b = mult b a.
 Proof. 
@@ -96,13 +101,13 @@ induction a.
 - simpl. rewrite <-IHa. apply Helper1.
 Qed.
 
-Lemma Associativity_Mult: forall a m n :N, mult a (sum m n) = 
+Lemma distribut_mult: forall a m n :N, mult a (sum m n) = 
 sum (mult a m) (mult a n).
 Proof.
 intros.
 induction a.
-- rewrite Zero_Mult. rewrite Zero_Mult. rewrite Zero_Mult. simpl. trivial.
-- rewrite Helper1. rewrite Helper1. rewrite Helper1. rewrite IHa. 
+- repeat rewrite Zero_Mult in *. trivial.
+- rewrite Helper1 in *. rewrite Helper1. rewrite Helper1. rewrite IHa. eauto.  
 rewrite Helper2 with (mult a m) m (sum (mult a n) n). rewrite comm with m (sum (mult a n) n).
 rewrite Helper2 with (mult a n) n m. rewrite comm with n m. 
 rewrite Helper2 with (mult a m) (mult a n) (sum m n). trivial.
@@ -112,11 +117,12 @@ Qed.
 Lemma Comutativity_Mult: forall l m n:N, mult (mult l m) n=mult l (mult m n).
 Proof.
 intros.
-simpl.
 induction n.
--simpl. trivial.
--simpl. rewrite IHn. rewrite Associativity_Mult. trivial.
+-auto.
+-simpl. rewrite IHn. rewrite distribut_mult. trivial.
 Qed.
+
+
 
 
 
