@@ -41,13 +41,7 @@ induction m.
 - simpl. apply unity.
 - simpl. rewrite <- IHm. apply komaki2.
 Qed.
-
-(*Definition product(m n:N) Admitted*)
-
-(*sdggsdfgsfdfg*)
-(* ha ha .. gharar bud ta 5 shanbe zarbo to git bezari.. inam zarb*)
-
-
+(*****************************       All   Done!       ******************)
 Fixpoint mult (m n:N):=
 match n with
   |zero => zero
@@ -55,7 +49,7 @@ match n with
 end.
 
 Definition VII: N:= S (S (S III)).
-
+(*Albatte in nemade 7 ha :D*)
 Lemma do_seta_shishta: mult II III=VII.
 Proof. 
 simpl. trivial.
@@ -68,8 +62,61 @@ simpl.
 apply unity.
 Qed.
 
+Lemma Zero_Mult: forall a:N , mult zero a = zero.
+Proof.
+induction a.
+-trivial.
+-simpl. apply IHa.
+Qed.
+Lemma Helper3: forall a b :N , sum ( S a ) b = S (sum a b).
+Proof.
+intros.
+rewrite komaki2. simpl. trivial.
+Qed.
+Lemma Helper2: forall a b c :N, sum (sum a b ) c = sum a (sum b c).
+Proof.
+intros.
+induction a.
+-simpl. rewrite unity. rewrite unity. trivial.
+-rewrite Helper3. rewrite Helper3. rewrite Helper3. rewrite IHa. trivial.
+Qed.
+Lemma Helper1: forall a b:N, mult (S a) b = sum (mult a b) b.
+Proof.
+intros.
+induction b.
+-trivial.
+-simpl. rewrite IHb. rewrite Helper2. 
+rewrite Helper2. rewrite comm with a b. trivial.
+Qed.
+Lemma Jabejaei_Mult: forall a b :N, mult a b = mult b a.
+Proof. 
+intros.
+induction a.
+-simpl. apply Zero_Mult.
+- simpl. rewrite <-IHa. apply Helper1.
+Qed.
+
+Lemma Associativity_Mult: forall a m n :N, mult a (sum m n) = 
+sum (mult a m) (mult a n).
+Proof.
+intros.
+induction a.
+- rewrite Zero_Mult. rewrite Zero_Mult. rewrite Zero_Mult. simpl. trivial.
+- rewrite Helper1. rewrite Helper1. rewrite Helper1. rewrite IHa. 
+rewrite Helper2 with (mult a m) m (sum (mult a n) n). rewrite comm with m (sum (mult a n) n).
+rewrite Helper2 with (mult a n) n m. rewrite comm with n m. 
+rewrite Helper2 with (mult a m) (mult a n) (sum m n). trivial.
+Qed.
+
 (*proof next lemma as exercise*)
-Lemma sherkat: forall l m n:N, mult (mult l m) n=mult l (mult m n).
+Lemma Comutativity_Mult: forall l m n:N, mult (mult l m) n=mult l (mult m n).
+Proof.
+intros.
+simpl.
+induction n.
+-simpl. trivial.
+-simpl. rewrite IHn. rewrite Associativity_Mult. trivial.
+Qed.
 
 
 
