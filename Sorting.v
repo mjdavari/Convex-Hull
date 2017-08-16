@@ -153,20 +153,10 @@ induction l.
 Qed.
 
 
-Lemma sort_sorts: forall (i:nat)(l: list Q), (i < (length l) - 1)%nat ->
- Qle (nth i (sort l) 0)  (nth (i+1) (sort l) 0).
+Lemma sort_sorts: forall (l: list Q), is_sorted( sort l).
 Proof.
 intros.
 induction l.
-  - simpl in *. induction i.
-     + apply Qle_irrefl. 
-  - simpl in *. apply Qle_refl.
-  - simpl in *. simpl in *. destruct IHl.
-    ++ .
-unfold insert.
-
-Inductive sort : list Q -> Prop :=
-  | nil_sort : sort nil
-  | cons_sort :
-      forall (a:Q) (l:list A), sort l -> lelistA a l -> sort (a :: l).
-Check Sort.
+  - simpl in *. apply empty_list_is_sorted.
+  - simpl in *. apply insert_works. auto.
+Qed. 
