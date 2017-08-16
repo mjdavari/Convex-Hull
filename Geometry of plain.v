@@ -107,31 +107,39 @@ Check length.
 Check nth.
 Check 0.
 
-Fixpoint is_convex_list (l : list (Q*Q))(d:Q*Q) :=
+(* Prop for a list to being a clockwise order of some convex polygon *)
+Definition is_convex_list (l : list (Q*Q))(d:Q*Q) :=
+(length l > 2)%nat ->  ((forall i: nat, (i>=0/\i<=((length l)-3))%nat-> 
+is_right ( nth i l d) (nth (i+1) l d) (nth (i+2) l d)) /\
+is_right ( nth ((length l)-2) l d) (nth ((length l)-1) l d) (nth O l d) /\
+is_right ( nth ((length l)-1) l d) (nth O l d) (nth (S O) l d)).
+(* Definition is_convex_list (l : list (Q*Q))(d:Q*Q) :=
   match l with
   | nil => True
   | a :: m => ( (lt (length m)  2)) \/ ( is_convex_list m d /\
 (is_left (nth ( (length m) - 2) m d) (nth 0 m d) a)) /\
 (is_left a (nth 0 m d) (nth 1 m d) )  /\
 (is_left (nth ((length m) - 3) m d) a (nth ((length m) - 2) m d)) 
-  end.
+  end. *)
 
 Definition lpoint : list (Q*Q)
   := (0 , 0) :: (0 , 1 ) :: (1 , 1)::(1 ,0) ::  nil.
+Eval compute in( length lpoint).
 
 Eval compute in (is_convex_list lpoint (4#1,0)).
 
-Fixpoint point_in_convex (p: Q*Q) (l: list (Q*Q)) (d :Q*Q) :=
+Definition point_in_convex (p: Q*Q) (l: list (Q*Q)) (d :Q*Q) :=
 (is_convex_list l d)  /\ (forall i: nat, (i>=0/\i<=((length l)-2))%nat-> 
 is_right ( nth i l d) (nth (i+1) l d) p)->is_right (nth ((length l)-1) l d)
 (nth 0 l d) p.
 
 Check point_in_convex.
 
-Lemma head_is_in:forall (l:list (Q*Q)) (d:Q*Q), point_in_convex (nth 0 l d) l d.
+Lemma head_is_in:forall (l:list (Q*Q)) (d:Q*Q), (is_convex_list l d )-> point_in_convex (nth 0 l d) l d.
 Proof.
 intros.
 unfold point_in_convex.
+split.
 
 
 
