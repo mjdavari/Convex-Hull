@@ -1,0 +1,9 @@
+c:\users\javad\documents\visual studio 2015\Projects\Compiler\Compiler\bin\Debug\Compiler.exe.config
+c:\users\javad\documents\visual studio 2015\Projects\Compiler\Compiler\bin\Debug\Compiler.exe
+c:\users\javad\documents\visual studio 2015\Projects\Compiler\Compiler\bin\Debug\Compiler.pdb
+c:\users\javad\documents\visual studio 2015\Projects\Compiler\Compiler\obj\Debug\Compiler.csprojResolveAssemblyReference.cache
+c:\users\javad\documents\visual studio 2015\Projects\Compiler\Compiler\obj\Debug\Compiler.Form1.resources
+c:\users\javad\documents\visual studio 2015\Projects\Compiler\Compiler\obj\Debug\Compiler.Properties.Resources.resources
+c:\users\javad\documents\visual studio 2015\Projects\Compiler\Compiler\obj\Debug\Compiler.csproj.GenerateResource.Cache
+c:\users\javad\documents\visual studio 2015\Projects\Compiler\Compiler\obj\Debug\Compiler.exe
+c:\users\javad\documents\visual studio 2015\Projects\Compiler\Compiler\obj\Debug\Compiler.pdb

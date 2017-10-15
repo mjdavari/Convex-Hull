@@ -107,11 +107,8 @@ induction l.
      sum_list (replace_in_list i (a :: l) t) + nth i (a :: l) 0 ==
      t + sum_list (a :: l)).
             ++ auto.
-            ++ simpl. dmit.
-
-      Search lt.
-      Nat.lt_succ_r
-        
+            ++ simpl.
+Qed.
 
 
 Lemma points_in_convex_set: forall (p: Q*Q)(c : convex_set),
