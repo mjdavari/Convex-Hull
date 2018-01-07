@@ -7,13 +7,14 @@ Require Import Coq.Arith.PeanoNat.
 Require Lra.
 
 Structure Point2D := {
-first:> Q;
-second:> Q;
+fst:> Q;
+snd:> Q;
 }.
+Axiom Q_equality : forall (x y : Q), x == y -> x = y.
 
 Inductive dim: Set := zero : dim | one :dim.
 
-Lemma eq_dim_dec : forall (i:dim)(j:dim), (i=j) + (~i=j).
+Lemma eq_dim_dec : forall (i:dim)(j:dim), {i=j} + {~i=j}.
 Proof.
 intros.
 induction i .
@@ -28,7 +29,7 @@ Qed.
 Definition dart := nat.
 Definition eq_dart_dec := eq_nat_dec.
 Definition nil := 0%nat.
-Definition default_point : Point2D := {| first:=0 ; second:=0|}.
+Definition default_point : Point2D := {| fst:=0 ; snd:=0|}.
 
 Inductive Hmap : Set := 
 V : Hmap
@@ -109,8 +110,8 @@ induction x.
 - left . apply nat_succ_ne_zero.
 Qed.
 Definition det (p q r : Point2D) : Q := 
-((first p) * second q) - (first q * second p) - (first p * second r) + 
-(first r * second p) + (first q * second r) - (first r * second q).
+((fst p) * (snd q)) - (fst q )* (snd p) - (fst p) * (snd r) + 
+(fst r )* (snd p) + (fst q) * (snd r) - (fst r) * (snd q).
 
 Definition prec_I (m:Hmap)(x:dart) : Prop := x <> nil /\ ~ exd m x.
 Definition prec_L (m:Hmap)(k:dim)(x:dart)(y:dart) : Prop :=
@@ -143,6 +144,12 @@ let x_1 := (k_succ_rev m one x) in let px_1 := (fpoint m x_1) in
 y <> x -> y <> x1 -> y <> x_1 -> px <> py).
 
 Definition ccw (p q r : Point2D) : Prop := det p q r > 0.
+Fixpoint max_dart (m:Hmap) : dart :=
+match m with
+V => nil
+| I m0 x p => if(lt_dec (max_dart m0) x) then x else (max_dart m0) 
+| L m0 _ _ _ => (max_dart m0)
+end.
 
 Lemma q_lt_bar: forall (x y:Q), ~x<y <-> x>=y.
 Proof.
@@ -174,25 +181,88 @@ V => True
 |L m0 _ _ _ => False
 end.
 
+Fixpoint mem_count (m:Hmap) : nat:=
+match m with 
+V => nil
+|I m0 _ _ => mem_count m0 + 1
+|L m0 _ _ _ => mem_count m0
+end.
+Lemma det_colinear: forall (p q:Point2D) , 
+~ccw p p q /\ ~ccw p q p /\ ~ccw q p p .
+Proof.
+intros.
+split.
+unfold ccw. unfold det. lra.
+split. unfold ccw. unfold det. lra. unfold ccw. unfold det. lra.
+Qed.
+Lemma ccw_not: forall (p q r:Point2D),
+ccw p q r -> ~ccw p r q.
+Proof.
+intros.
+unfold ccw in *. unfold det in *. lra.
+Qed.
+Lemma ccw_cyclity: forall( p r q:Point2D),
+ccw p q r -> ccw q r p.
+Proof. intros. unfold ccw in *. unfold det in *. lra.
+Qed.
+Lemma ccw_symm: forall( p q r :Point2D),
+ccw p q r -> ~ ccw p r q.
+Proof.
+intros. unfold ccw in *. unfold det in *. lra.
+Qed.
+Lemma ccw_inter: forall (p q r t:Point2D),
+ccw t q r -> ccw p t r -> ccw p q t -> ccw p q r.
+Proof.
+intros. unfold ccw in *. unfold det in *. lra.
+Qed.
 
+Lemma Q_gt_0_plus : forall (r1 r2 : Q),
+  r1 > 0 -> r2 > 0 -> r1 + r2 > 0.
+Proof.
+intros.
+lra.
+Qed.
+ 
+Lemma Q_gt_0_mult : forall (r1 r2 : Q),
+  r1 > 0 -> r2 > 0 -> r1 * r2 > 0.
+Proof. 
+intros. assert( 0 * r2 <  r1 * r2).
+ apply (Qmult_lt_compat_r 0 r1 r2 ).
+- tauto.
+- tauto.
+- lra.
+Qed.
+Lemma Q_gt_0_div : forall (r1 r2 : Q),
+  r1 > 0 -> r2 > 0 -> r1 * / r2 > 0.
+Proof.
+intros. 
+assert( /r2 > 0).
+apply Qinv_lt_0_compat. tauto.
+apply Q_gt_0_mult.
+tauto. tauto.
+Qed.
 
+Lemma Q_mult_div : forall (r1 r2 r3 : Q),
+  r1 = r2 * r3 -> r2 > 0 -> (r1 * / r2 = r3).
+Proof. 
+intros.
 
+assert (r1 * / r2 == r3).
+- rewrite H in *. assert(r2*r3 == r3*r2). apply (Qmult_comm ).
+  rewrite H1 in *. assert (r2 * / r2 ==1). apply (Qmult_inv_r r2).
+  lra. assert(r3 * r2 * / r2 == r3 * (r2 * / r2)).
+  lra. rewrite H2 in *. assert (r3 * 1 == r3). lra.
+  rewrite H4 in H3. tauto.
+- apply Q_equality. tauto.
+Qed.
 
+Axiom ccw_trans: forall(p q r t s : Point2D),
+(ccw s t p) -> (ccw s t q) -> (ccw s t r) -> (ccw t p q) -> (ccw t q r) -> 
+  (ccw t p r).
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+(*dual transivity for leftdart dl and its next and previous darts dln and dlp
+from the point of view p for arbitrary point do*)
+Axiom ccw_dual_trans: forall (t s p q r :Point2D),
+ccw t s p -> ccw t s r -> ccw t s q -> ccw s p q -> 
+ccw s q r -> ccw s p r.
+ 
