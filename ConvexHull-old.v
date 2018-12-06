@@ -21,6 +21,9 @@ Definition red_dart (m:Hmap)(d:dart) : Prop :=
 ~ has_succ m zero d /\ has_succ m one d /\
 has_pred m zero d /\ ~ has_pred m one d.
 
+Definition inv_poly (m:Hmap) : Prop := forall (d:dart),
+exd m d -> black_dart m d \/ blue_dart m d \/ red_dart m d.
+
 Lemma black_dart_dec: forall (m:Hmap)(d:dart) , {black_dart m d} + {~black_dart m d}.
 Proof.
 intros.
@@ -62,7 +65,14 @@ unfold red_dart. case (succ_dec m zero d).
       -- intros. tauto.
   ++ intros. right. intro. tauto.
 Qed. 
+ Lemma dart_color_dec: forall (m:Hmap) (d:dart),
+well_emb m -> exd m d-> {red_dart m d} + {black_dart m d} + {blue_dart m d}.
+Proof.
+intros.
+unfold well_emb in *. apply H in H0. clear H. 
+intros. unfold red_dart.
 
+Qed.
 Definition convex (m:Hmap) : Prop := forall (x:dart)(y:dart),
 exd m x -> exd m y -> blue_dart m x ->
 let px := (fpoint m x) in let py := (fpoint m y) in
@@ -898,27 +908,96 @@ induction m.
        ++ intro. tauto.
     -- intro. tauto.
 Qed.
-Lemma left_dart_h1: forall(mr :Hmap) (d1 d2 :dart) (p: Point2D),
-inv_hmap mr -> convex mr ->  exd mr d1 -> exd mr d2 -> left_dart mr p d1 ->
- fpoint mr d1 <> fpoint mr d2 -> ccw (fpoint mr d1) p (fpoint mr d2).
+Lemma pred_fpoint_eq: forall(m:Hmap) (d: dart),
+well_emb m -> exd m d -> blue_dart m d -> fpoint m d = fpoint m (k_pred m one d).
 Proof.
 intros.
-unfold left_dart in *.
-elim H3. intro. intro. elim H6. intro. intro. clear H3 H6.
-unfold invisible in *. unfold visible in *. case(blue_dart_dec mr (k_succ_rev mr one d1)) in *.
-- unfold k_succ_rev in *.  unfold blue_dart in *. 
-     apply proj2 in b. apply proj1 in b. apply proj2 in H5. apply proj2 in H5. apply proj2 in H5.
-      assert (False). apply (succ_pred) in H5.
-      tauto.  tauto. tauto.
-- case(blue_dart_dec mr d1) in *.
-  + unfold k_succ_rev in *. simpl in *. 
-    remember (fpoint mr d1) as pd1. remember (fpoint mr d2) as pd2. 
-    remember (fpoint mr (k_pred mr zero (k_pred mr one d1))) as pred.
-    remember (fpoint mr (k_succ mr zero d1)) as pnex. 
-    apply (ccw_dual_trans pred pd1 p pnex pd2).
-    admit. admit. admit. tauto. admit.
-  + tauto.      
+unfold well_emb in *.
+specialize H with d. apply H in H0.
+unfold blue_dart in *. apply proj2 in H1. apply proj2 in H1. apply proj2 in H1.
+apply proj2 in H0. apply proj2 in H0. apply proj2 in H0. apply proj1 in H0.
+apply H0 in H1. unfold k_succ_rev in *. tauto.
 Qed.
+Lemma submap_fpoint: forall (m mr :Hmap) (d:dart),
+submap m mr -> exd m d-> fpoint m d = fpoint mr d.
+Proof.
+intros.
+induction m.
+- tauto.
+- simpl in *.
+  case (eq_dart_dec d0 d) in *.
+  + rewrite e in *. symmetry. tauto.
+  + tauto.
+- simpl in *. tauto.
+Qed. 
+Lemma submap_noncollinear: forall (m mr : Hmap),
+submap m mr -> noncollinear mr -> noncollinear m.
+Proof.
+intros.
+unfold noncollinear in *.
+intros. specialize H0 with d1 d2 d3.
+assert (exd mr d1). apply (submap_exist_rel m mr d1 ). tauto. tauto.
+assert (exd mr d2). apply (submap_exist_rel m mr d2 ). tauto. tauto.
+assert (exd mr d3). apply (submap_exist_rel m mr d3 ). tauto. tauto.
+assert (fpoint m d1 = fpoint mr d1).
+apply (submap_fpoint m mr d1). tauto. tauto.
+assert (fpoint m d2 = fpoint mr d2).
+apply (submap_fpoint m mr d2). tauto. tauto.
+assert (fpoint m d3 = fpoint mr d3).
+apply (submap_fpoint m mr d3). tauto. tauto.
+
+rewrite <- H10 in H0. rewrite <- H11 in H0. rewrite <- H12 in H0.
+ tauto.
+Qed.
+Lemma left_dart_h1: forall(m mr :Hmap) (d1 d2 dnew:dart) ,
+inv_hmap m -> well_emb m-> submap m mr-> noncollinear mr -> convex m ->
+exd mr dnew -> exd m d1 -> exd m d2 -> left_dart m (fpoint mr dnew) d1 ->
+ ccw (fpoint m d1) (fpoint mr dnew) (fpoint m d2).
+Proof.
+intros.
+remember (fpoint mr dnew) as p.
+unfold left_dart in *.
+elim H7. intro. intro. elim H9. intro. intro.
+unfold invisible in *. unfold visible in *. case(blue_dart_dec m (k_succ_rev m one d1)) in *.
+- unfold k_succ_rev in *.  unfold blue_dart in *. 
+     apply proj2 in b. apply proj1 in b. apply proj2 in H8. apply proj2 in H8. apply proj2 in H8.
+      assert (False). apply (succ_pred) in H8.
+      tauto.  tauto. tauto.
+- case(blue_dart_dec m d1) in *.
+  + unfold k_succ_rev in *. simpl in *. 
+    remember (fpoint m d1) as pd1. remember (fpoint m d2) as pd2. 
+    remember (fpoint m (k_pred m zero (k_pred m one d1))) as pred.
+    remember (fpoint m (k_succ m zero d1)) as pnex. 
+    
+    apply (ccw_dual_trans pred pd1 p pnex pd2).
+    -- assert(fpoint m (k_pred m one d1) = pd1).  
+        ++ unfold blue_dart in b. symmetry. rewrite Heqpd1. apply (pred_fpoint_eq m d1).  (*fpoint d1 and k_pred one d1 are same from blue_dart*)
+           tauto. tauto. tauto.                   
+        ++ rewrite  H12 in H7. assert(~ ccw pred p pd1). tauto.
+         apply ccw_not_col . tauto.
+         unfold noncollinear in *. 
+        specialize H2 with (k_pred m zero (k_pred m one d1)) dnew d1.
+        
+        assert(fpoint m (k_pred m zero (k_pred m one d1)) = fpoint mr (k_pred m zero (k_pred m one d1))).
+         apply submap_fpoint. tauto. case (dart_color_dec m (k_pred m one d1)).   
+        tauto. 
+          admit. 
+       rewrite  Heqpred . rewrite Heqpd1 . rewrite Heqp . 
+         assert(fpoint m d1 = fpoint mr d1).
+          apply submap_fpoint. tauto. tauto. 
+          rewrite H15.          apply H2.
+         apply(submap_exist_rel m mr (k_pred m zero (k_pred m one d1))).
+           tauto. admit.
+           tauto. apply (submap_exist_rel m mr d1). tauto. tauto.
+           admit.
+            admit. admit. 
+         
+    -- admit. (* results from convexity and blue_dart d1*)
+    -- admit. (* results from blue_dart d1*)
+    --tauto.
+    -- admit. (* results from blue_dart d1*)
+  + tauto.      
+
 Lemma left_dart_uniq: forall (mr: Hmap) (d1 d2 :dart) (p:Point2D),
 convex mr -> exd mr d1 -> exd mr d2 -> left_dart mr p d1 -> left_dart mr p d2 -> d1 = d2.
 Proof. 
@@ -1152,8 +1231,7 @@ visible m (Iter (cF m) i d) p.
 Theorem well_emb_CH : forall (m:fmap),
 prec_CH (m) -> well_emb (CH m).
 
-Definition inv_poly (m:Hmap) : Prop := forall (d:dart),
-exd m d -> black_dart m d \/ blue_dart m d \/ red_dart m d.
+
 
 Theorem inv_poly_CH : forall (m:Hmap),
 prec_CH m -> inv_poly (CH m).

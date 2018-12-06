@@ -1,0 +1,12 @@
+DIGEST ef3cb52eb0327d5fb37ecbd1456ca237
+FKnuth
+R15:19 Coq.Arith.Arith <> <> lib
+R37:41 Coq.Reals.Reals <> <> lib
+R59:63 Coq.micromega.Psatz <> <> lib
+R81:92 Coq.Init.Nat <> <> lib
+R110:115 Coq.QArith.QArith <> <> lib
+R134:151 Coq.QArith.QArith_base <> <> lib
+R169:186 Coq.Arith.PeanoNat <> <> lib
+R197:199 Coq.micromega.Lra <> <> lib
+R217:221 Coq.omega.Omega <> <> lib
+R239:244 Coq.Structures.Orders <> <> lib

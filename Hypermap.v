@@ -6,6 +6,7 @@ Require Import QArith.Qminmax.
 Require Import Coq.Arith.PeanoNat.
 Require Lra.
 
+
 Structure Point2D := {
 fst:> Q;
 snd:> Q;
@@ -144,6 +145,7 @@ let x_1 := (k_succ_rev m one x) in let px_1 := (fpoint m x_1) in
 y <> x -> y <> x1 -> y <> x_1 -> px <> py).
 
 Definition ccw (p q r : Point2D) : Prop := det p q r > 0.
+
 Fixpoint max_dart (m:Hmap) : dart :=
 match m with
 V => nil
@@ -201,6 +203,17 @@ Proof.
 intros.
 unfold ccw in *. unfold det in *. lra.
 Qed.
+Lemma ccw_not_col: forall (p q r:Point2D),
+~ccw p q r -> ~ collinear p q r -> ccw p r q.
+Proof.
+intros.
+unfold ccw in *.
+unfold collinear in *. apply (Qnot_lt_le 0 (det p q r) ) in H. 
+apply (Qle_lteq (det p q r) 0) in H. elim H.
+intro. unfold det in *. lra.
+intro. apply (Q_equality (det p q r) 0) in H1. tauto.
+Qed.
+
 Lemma ccw_cyclity: forall( p r q:Point2D),
 ccw p q r -> ccw q r p.
 Proof. intros. unfold ccw in *. unfold det in *. lra.

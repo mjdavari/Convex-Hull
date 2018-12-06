@@ -159,4 +159,6 @@ intros.
 induction l.
   - simpl in *. apply empty_list_is_sorted.
   - simpl in *. apply insert_works. auto.
-Qed. 
+Qed.
+
+ 
