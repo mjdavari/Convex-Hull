@@ -1,4 +1,4 @@
-
+Add LoadPath "C:\Users\javad\Desktop\PhD\coq\GitProject\Convex Hull".
 Require Import Arith.
 Require Import Reals.
 Require Import Psatz.
@@ -630,7 +630,7 @@ match ls with
 | pt1 :: ls' => ((id pt1) > 0 )%nat /\ positive_id_list ls' 
 end.
 
-Fixpoint well_formed_list (ls:list Point2D): Prop := distinct_list ls /\ distinct_id_list ls /\ positive_id_list ls.
+Fixpoint well_formed_list (ls:list Point2D): Prop := distinct_list ls /\ distinct_id_list ls /\ positive_id_list ls .
 
 Lemma distinct_remove:  forall(ls : list Point2D) (pt : Point2D),
  distinct_list (pt :: ls) -> distinct_list ls.
@@ -719,7 +719,7 @@ unfold is_in_list. fold is_in_list. simpl in H. destruct H.
       destruct H. tauto.
     -- tauto.
 Qed. 
-    
+
 Lemma next_in_list_remove: forall (ls: list Point2D)(pt1 pt2:Point2D),
 id pt1 <> id pt2 -> is_in_list ls pt2 -> next_in_list (pt1 :: ls) pt2 = (next_in_list ls pt2) \/ next_in_list (pt1 :: ls) pt2 = pt1.
 Proof.

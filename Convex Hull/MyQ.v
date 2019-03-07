@@ -5,7 +5,15 @@ Require Import Coq.Init.Nat.
 Require Import QArith. 
 Require Import QArith.QArith_base.
 Require Import Coq.Arith.PeanoNat.
+Require Import ZArith.
+Require Import BinNat Bool Equalities GenericMinMax
+ OrdersFacts ZAxioms ZProperties.
+Require Import BinIntDef BinInt Zorder Zcompare Znat Zmin Zmax Zminmax
+ Zabs Zeven auxiliary ZArith_dec Zbool Zmisc Wf_Z  
+ Zcomplements Zsqrt_compat Zpow_def Zpow_alt Zpower Zdiv Zwf  Int Zpow_facts Zdigits.
+Require BinIntDef.
 Require Lra.
+Require Import Ring.
 Axiom Q_equality : forall (q1 q2 : Q), q1 == q2 -> q1 = q2.
 
 
@@ -71,15 +79,29 @@ rewrite <- Z.gt_lt_iff . rewrite Z.mul_comm. rewrite Z.mul_1_l.
 apply Zgt_iff_lt. apply (Z.mul_neg_neg (Qnum r1) (Qnum r2)).
 apply Zgt_iff_lt in H. tauto. apply Zgt_iff_lt in H0. tauto.
 Qed.
-
-Lemma Q_lt_0_div : forall (r1 r2 : Q),
-  r1 < 0 -> r2 < 0 -> 0 <r1  / r2 .
+Lemma Q_lt_0_neg: forall(a:Q) , a<0 -> -a > 0.
+Proof. intros.
+apply Qlt_minus_iff in H.
+assert (H1:= (Qplus_0_l (-a)) ). rewrite H1 in H. tauto.
+Qed.
+Lemma Q_gt_0_neg: forall(a:Q) , a>0 -> -a < 0.
+Proof. intros. lra.
+Qed.
+Lemma Q_mult_negpos: forall (a b:Q) , a<0 -> b>0 -> a * b < 0.
 Proof.
-intros r1 r2 H1 H2.  apply (Q_lt_0_mult). tauto. apply Qlt_minus_iff in H2.
-assert (H3:= (Qplus_0_l (-r2)) ). apply Q_equality in H3.
-rewrite H3 in H2. apply Qinv_lt_0_compat in H2. 
-rewrite <- RMicromega.Qinv_opp in H2. 
- lra.
+intros. 
+ apply Q_lt_0_neg in H.   assert (H2:-a * b > 0).
+ apply (Q_gt_0_mult ). tauto. tauto. 
+lra.
+Qed.
+Lemma Q_lt_0_div : forall (r1 r2 : Q),
+  r1 < 0 -> r2 < 0 -> 0 <r1  */ r2 .
+Proof.
+intros.
+apply Q_lt_0_mult. tauto. apply Q_lt_0_neg in H0.
+apply Qinv_lt_0_compat in H0. apply Q_gt_0_neg in H0. 
+induction r2. simpl in *. unfold Qinv in *. simpl.
+induction Qnum. simpl in *. lra. tauto. tauto.
 Qed.
 Lemma Q_mult_div : forall (r1 r2 r3 : Q),
   r1 = r2 * r3 -> r2 > 0 -> r1 * / r2 = r3.
@@ -106,9 +128,17 @@ Lemma Qmult_minus_dist : forall (a b c :Q) , a * (b  -  c) == a* b - a*c.
 Proof.
 intros. lra.
 Qed.
+Lemma Q_mult_sign_ch:forall (a b :Q) , a * (-b) == (-a) * b.
+Proof.
+intros. lra. 
+Qed. 
+
 Lemma Q_inv_sign_ch:forall (a b :Q) , a */ (-b) == (-a) */ b.
-Proof. intros. 
-rewrite <- RMicromega.Qinv_opp. lra.
+Proof. intros. induction b. induction a.
+
+ unfold Qinv in *. simpl.
+induction (Qnum ). simpl in *. lra. simpl. unfold Qeq. simpl. lia.
+simpl. unfold Qeq. simpl. lia.
 Qed. 
 Lemma Q_div_sign_ch: forall (a b :Q) ,  a / -b == -a / b.
 Proof. intros.
@@ -123,19 +153,4 @@ Qed.
 Lemma Q_mult_div_nom: forall (a b c:Q) , a * (b/c) == (a *b) / c.
 Proof. intros.
 unfold Qdiv. lra.
-Qed.
-Lemma Q_lt_0_neg: forall(a:Q) , a<0 -> -a > 0.
-Proof. intros.
-apply Qlt_minus_iff in H.
-assert (H1:= (Qplus_0_l (-a)) ). rewrite H1 in H. tauto.
-Qed.
-Lemma Q_gt_0_neg: forall(a:Q) , a>0 -> -a < 0.
-Proof. intros. lra.
-Qed.
-Lemma Q_mult_negpos: forall (a b:Q) , a<0 -> b>0 -> a * b < 0.
-Proof.
-intros. 
- apply Q_lt_0_neg in H.   assert (H2:-a * b > 0).
- apply (Q_gt_0_mult ). tauto. tauto. 
-lra.
 Qed.
